@@ -54,7 +54,7 @@ export default function QA() {
         );
 
         const result = await response.json();
-        console.log(result);
+        // console.log(result);
         setAnswer(result[0].generated_text);
 
         return result;

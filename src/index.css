@@ -1,0 +1,28 @@
+/* body {
+  margin: 0;
+  font-family: Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #292929 !important;
+} */
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+
+* {
+  outline: none;
+  border: none;
+  margin: 0px;
+  padding: 0px;
+  font-family: Courier, monospace;
+}
+
+body {
+  background: #333 url(https://static.tumblr.com/maopbtg/a5emgtoju/inflicted.png) repeat;
+}

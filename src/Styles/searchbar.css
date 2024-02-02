@@ -1,0 +1,117 @@
+.height {
+
+    height: 20vh;
+}
+
+.container {
+
+    max-width: 80% !important;
+    margin: auto !important;
+}
+
+.form {
+
+    position: relative;
+    max-width: 100%;
+    margin: auto;
+
+    background: rgba(255, 255, 255, 0);
+    /* box-shadow: 0 8px 32px 0 rgba(236, 236, 241, 0.37); */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* border: 1px solid rgba(255, 255, 255, 0.18); */
+}
+
+.form .fa-search {
+
+    position: absolute;
+    top: 20px;
+    left: 15px;
+    color: #9ca3af;
+
+}
+
+/* .form span {
+
+    position: absolute;
+    right: 17px;
+    top: 13px;
+    padding: 2px;
+    border-left: 1px solid #d1d5db;
+
+} */
+
+.left-pan {
+    padding-left: 7px;
+
+    background: rgba(255, 255, 255, 0);
+    /* box-shadow: 0 8px 32px 0 rgba(236, 236, 241, 0.37); */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 0px !important;
+}
+
+.left-pan i {
+    position: relative;
+    right: 4px;
+    top: 5px;
+    padding: 10px;
+    font-size: x-large;
+    color: #9d9090;
+}
+
+.left-pan i:hover,
+.left-pan1 i:hover {
+    color: #fff;
+    cursor: pointer;
+    font-size: x-large;
+    transition: 0.2s;
+}
+
+.left-pan i:hover {
+    font-size: xx-large;
+    transition: 0.2s;
+    top: 2px;
+}
+
+.left-pan1 {
+    padding-left: 2%;
+    padding-right: 1%;
+
+    background: rgba(255, 255, 255, 0);
+    /* box-shadow: 0 8px 32px 0 rgba(236, 236, 241, 0.37); */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 0px !important;
+}
+
+.left-pan1 i {
+    position: relative;
+    right: 0px;
+    top: 17px;
+    font-size: large;
+    color: #9d9090;
+}
+
+.form-input {
+    height: 55px;
+    /* text-indent: 33px; */
+    border-radius: 0px !important;
+    border: none !important;
+    outline: none !important;
+
+    background: rgba(255, 255, 255, 0) !important;
+    /* box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 10px;
+    /* border: 1px solid rgba(255, 255, 255, 0.18); */
+    color: #9d9090 !important;
+}
+
+.form-input:focus {
+
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+}

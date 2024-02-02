@@ -1,0 +1,51 @@
+{
+  "name": "text-alchemist",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.1",
+    "@huggingface/inference": "^2.6.4",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@uidotdev/usehooks": "^2.4.1",
+    "@xenova/transformers": "^2.10.1",
+    "mdb-react-ui-kit": "^7.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "react-player": "^2.13.0",
+    "react-scripts": "5.0.1",
+    "react-speech-recognition": "^3.10.0",
+    "use-sound": "^4.0.1",
+    "web-vitals": "^2.1.4",
+    "webpack": "^5.89.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "react-router-dom": "^6.20.1"
+  }
+}

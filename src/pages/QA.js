@@ -33,7 +33,7 @@ export default function QA() {
         const input = text + " Answer the following question. " + question;
         const data = { inputs: input };
         toast.promise(findAnswer(data), {
-            loading: 'Generating Summary...',
+            loading: 'Generating Answer...',
             success: 'Answer generated successfully!',
             error: 'Error generating answer.',
         });

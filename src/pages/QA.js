@@ -41,7 +41,7 @@ export default function QA() {
 
     const findAnswer = async (data) => {
 
-        const token = "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";
+        const token = process.env.REACT_APP_HUGGING_FACE_API_KEY;
         // console.log("token : ", token);
 
         const response = await fetch(

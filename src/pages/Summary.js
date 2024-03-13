@@ -3,6 +3,8 @@ import TextBox from '../component/TextBox';
 import { useState } from 'react'
 import { toast } from 'react-hot-toast';
 import '../Styles/Summary.css';
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 // import { useLockBodyScroll } from "@uidotdev/usehooks";
 
 export default function Summary() {
@@ -11,9 +13,38 @@ export default function Summary() {
 
     const [text, setText] = useState('');
     const [summary, setSummary] = useState('');
+    const [maxOutputSentence, setMaxOutputSentence] = useState(1);
+    const [outputSentence, setOutputSentence] = useState('');
+
+    const countSentences = (paragraph) => {
+        // Split the paragraph into sentences using regular expression
+        const sentences = paragraph.split(/[.?!]\s+/);
+
+        // Filter out empty elements (potential extra splits at the end)
+        const filteredSentences = sentences.filter(sentence => sentence.trim() !== "");
+
+        // Return the length of the filtered array (number of sentences)
+        return filteredSentences.length;
+    }
+
+    const removeExtraSpaces = (text) => {
+        // Regular expression to match one or more whitespace characters
+        const regex = /\s+/g;
+
+        // Replace extra spaces with a single space
+        const trimmedText = text.replace(regex, ' ');
+
+        // Trim leading and trailing spaces (optional)
+        return trimmedText.trim();
+    }
+
 
     const handleChange = (event) => {
-        setText(event.target.value);
+        let text = event.target.value;
+        if (text.charAt(text.length - 1) !== ' ')
+            text = removeExtraSpaces(event.target.value);
+        setMaxOutputSentence(countSentences(text));
+        setText(text);
     };
 
     const handleSubmit = async (event) => {
@@ -25,33 +56,88 @@ export default function Summary() {
             return;
         }
 
-        toast.promise(summarize(text), {
+        let trimText = removeExtraSpaces(text);
+        setText(trimText);
+
+        let prompt = `write a summary of the following text : 
+        ` + text;
+
+        if (outputSentence < 1) {
+            if (outputSentence !== '') {
+                toast.error('Output sentences cannot be less than 1.');
+                return;
+            }
+        }
+
+        if (outputSentence > maxOutputSentence) {
+            toast.error('Output sentences cannot be more than the number of sentences in the input text.');
+            return;
+        }
+
+        if (outputSentence >= 1 && outputSentence <= maxOutputSentence) {
+            prompt = `write a summary of the following text : 
+        ` + text + `
+        Summarize it in ` + outputSentence + ` sentences at the third-grade reading level.`;
+        }
+
+        toast.promise(summarize(prompt), {
             loading: 'Generating Summary...',
             success: 'Summary generated successfully!',
-            error: 'Error generating summary.',
+            error: error => error.message,
         });
         // await summarize(text);
     };
 
-    const summarize = async (data) => {
+    const summarize = async (prompt) => {
 
-        const token = "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";
+        const token = process.env.REACT_APP_GEMINI_API_KEY;
+        const genAI = new GoogleGenerativeAI(token);
+        // const prompt = 'write a summary of the following text: ' + data;
         // console.log("token : ", token);
 
-        const response = await fetch(
-            "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
-            {
-                headers: { Authorization: `Bearer ${token}` },
-                method: "POST",
-                body: JSON.stringify(data),
-            }
-        );
+        // const response = await fetch(
+        //     "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
+        //     {
+        //         headers: { Authorization: `Bearer ${token}` },
+        //         method: "POST",
+        //         body: JSON.stringify(data),
+        //     }
+        // );
 
-        const result = await response.json();
-        // console.log(result);
-        setSummary(result[0].summary_text);
+        const generationConfig = {
+            maxOutputTokens: 128, // Adjust for desired summary length (max 1024)
+            temperature: 0.0, // Adjust for creativity vs. informativeness (0.0-1.0)
+            topP: 0.1,
+            topK: 16,
+        };
 
-        return result;
+        const model = genAI.getGenerativeModel({ model: "gemini-pro", generationConfig });
+
+        let text = '';
+        console.log(prompt);
+        try {
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            text = response.text();
+        }
+        catch (error) {
+            throw new Error('Error generating summary...');
+        }
+        // console.log(text);
+
+        // const result = await response.json();
+        console.log(text);
+        // setSummary(result[0].summary_text);
+        if (text === '') {
+            if (outputSentence === '')
+                throw new Error('Error generating summary...');
+            else
+                throw new Error('Error generating summary... Please try again with a smaller number of sentences.');
+        }
+
+        setSummary(text);
+
+        return text;
 
     }
 
@@ -84,15 +170,18 @@ export default function Summary() {
 
     const btnsForInput = (
 
-        <div className="row w-50 m-auto p-2 justify-content-around">
-            <div className="col my-1">
+        <div className="row w-100 m-auto p-2 justify-content-around">
+            <div className="col-3 my-1">
                 <button className="btn btn-success" onClick={handleSubmit}>Summary</button>
             </div>
-            <div className="col my-1">
+            <div className="col-3 my-1">
                 <button className="btn btn-primary" onClick={(e) => {
                     e.preventDefault();
                     setText('');
                 }}>Clear</button>
+            </div>
+            <div className="form-group col-6 my-1">
+                <input type="number" value={outputSentence} onChange={e => setOutputSentence(e.target.value)} min={1} max={maxOutputSentence} className='w-100' id="numberInput" placeholder='Output Sentences' style={{ color: "white", display: "inline", background: "transparent", border: "none!important", outline: "none!important", borderBottom: "2px solid white" }} />
             </div>
         </div>
 

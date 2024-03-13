@@ -5,11 +5,7 @@ import { toast } from 'react-hot-toast';
 import '../Styles/Summary.css';
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// import { useLockBodyScroll } from "@uidotdev/usehooks";
-
 export default function Summary() {
-
-    // useLockBodyScroll();
 
     const [text, setText] = useState('');
     const [summary, setSummary] = useState('');
@@ -49,7 +45,6 @@ export default function Summary() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        // console.log(text);
 
         if (text === '') {
             toast.error('Please enter some text.');
@@ -59,8 +54,8 @@ export default function Summary() {
         let trimText = removeExtraSpaces(text);
         setText(trimText);
 
-        let prompt = `write a summary of the following text : 
-        ` + text;
+        let prompt = `write a summary of the following paragraph and don't generate random sentences. Give appropriate response if paragraph is too small:
+` + text;
 
         if (outputSentence < 1) {
             if (outputSentence !== '') {
@@ -75,9 +70,9 @@ export default function Summary() {
         }
 
         if (outputSentence >= 1 && outputSentence <= maxOutputSentence) {
-            prompt = `write a summary of the following text : 
-        ` + text + `
-        Summarize it in ` + outputSentence + ` sentences at the third-grade reading level.`;
+            prompt = `write a summary of the following paragraph and don't generate random sentences. Give appropriate response if paragraph is too small:
+` + text + `
+Summarize it in ` + outputSentence + ` sentences at the third-grade reading level.`;
         }
 
         toast.promise(summarize(prompt), {
@@ -85,24 +80,12 @@ export default function Summary() {
             success: 'Summary generated successfully!',
             error: error => error.message,
         });
-        // await summarize(text);
     };
 
     const summarize = async (prompt) => {
 
         const token = process.env.REACT_APP_GEMINI_API_KEY;
         const genAI = new GoogleGenerativeAI(token);
-        // const prompt = 'write a summary of the following text: ' + data;
-        console.log("token : ", token);
-
-        // const response = await fetch(
-        //     "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",
-        //     {
-        //         headers: { Authorization: `Bearer ${token}` },
-        //         method: "POST",
-        //         body: JSON.stringify(data),
-        //     }
-        // );
 
         const generationConfig = {
             maxOutputTokens: 128, // Adjust for desired summary length (max 1024)
@@ -114,7 +97,7 @@ export default function Summary() {
         const model = genAI.getGenerativeModel({ model: "gemini-pro", generationConfig });
 
         let text = '';
-        console.log(prompt);
+        // console.log(prompt);
         try {
             const result = await model.generateContent(prompt);
             const response = await result.response;
@@ -123,11 +106,7 @@ export default function Summary() {
         catch (error) {
             throw new Error('Error generating summary...');
         }
-        // console.log(text);
 
-        // const result = await response.json();
-        console.log(text);
-        // setSummary(result[0].summary_text);
         if (text === '') {
             if (outputSentence === '')
                 throw new Error('Error generating summary...');
@@ -144,10 +123,8 @@ export default function Summary() {
     const copyText = (e) => {
         e.preventDefault();
         navigator.clipboard.writeText(summary).then(() => {
-            // Success message
             toast.success('Text copied to clipboard!');
         }, () => {
-            // Error message
             toast.error('Error copying text to clipboard!');
         });
     }
@@ -188,16 +165,6 @@ export default function Summary() {
     );
 
     return (
-        // <div className="container-fluid vh-100 mw-100">
-        //     <div className="row">
-        //         <div className="col-12 col-md-6 mw-100" style={{ minWidth: "auto" }}>
-        //             <TextBox disabled={false} placeholder={"Enter text here.."} rows={10} value={text} handleChange={handleChange} handleSubmit={handleSubmit} buttons={btnsForInput} />
-        //         </div>
-        //         <div className="col-12 col-md-6 mw-100" style={{ minWidth: "auto" }}>
-        //             <TextBox disabled={true} placeholder={"Result will be shown here.."} rows={10} value={summary} handleChange={handleChange} buttons={btnsForResult} />
-        //         </div>
-        //     </div>
-        // </div>
 
         <div className="container-fluid" style={{ minWidth: "100%" }}>
             <div className="row">

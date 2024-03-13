@@ -14,6 +14,18 @@
     object-fit: contain;
 }
 
+.tryAgain {
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+    -webkit-transition: .1s ease-in-out;
+    transition: .3s ease-in-out;
+}
+
+.tryAgain:hover {
+    -webkit-filter: grayscale(0);
+    filter: grayscale(0);
+}
+
 .container {
     position: relative;
     margin-top: 50px;
@@ -39,7 +51,7 @@
     background: rgba(0, 0, 0, .7);
 }
 
-img {
+.img {
     position: absolute;
     width: 100%;
     height: 100%;

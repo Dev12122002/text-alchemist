@@ -3,23 +3,40 @@ import TextBox from '../component/TextBox';
 import { useState } from 'react'
 import { toast } from 'react-hot-toast';
 import '../Styles/qa.css';
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 export default function QA() {
     const [text, setText] = useState('');
     const [answer, setAnswer] = useState('');
     const [question, setQuestion] = useState('');
 
+    const removeExtraSpaces = (text) => {
+        // Regular expression to match one or more whitespace characters
+        const regex = /\s+/g;
+
+        // Replace extra spaces with a single space
+        const trimmedText = text.replace(regex, ' ');
+
+        // Trim leading and trailing spaces (optional)
+        return trimmedText.trim();
+    }
+
     const handleText = (event) => {
-        setText(event.target.value);
+        let text = event.target.value;
+        if (text.charAt(text.length - 1) !== ' ')
+            text = removeExtraSpaces(event.target.value);
+        setText(text);
     };
 
     const handleQuestion = (event) => {
-        setQuestion(event.target.value);
+        let text = event.target.value;
+        if (text.charAt(text.length - 1) !== ' ')
+            text = removeExtraSpaces(event.target.value);
+        setQuestion(text);
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        // console.log(text);
 
         if (text === '') {
             toast.error('Please enter some text.');
@@ -30,44 +47,56 @@ export default function QA() {
             return;
         }
 
-        const input = text + " Answer the following question. " + question;
-        const data = { inputs: input };
-        toast.promise(findAnswer(data), {
+        const prompt = `context : ${text}
+        
+Answer the following question based on context:
+${question}?`;
+
+        toast.promise(findAnswer(prompt), {
             loading: 'Generating Answer...',
             success: 'Answer generated successfully!',
-            error: 'Error generating answer.',
+            error: error => error.message,
         });
     };
 
-    const findAnswer = async (data) => {
+    const findAnswer = async (prompt) => {
 
-        const token = process.env.REACT_APP_HUGGING_FACE_API_KEY;
-        // console.log("token : ", token);
+        const token = process.env.REACT_APP_GEMINI_API_KEY;
+        const genAI = new GoogleGenerativeAI(token);
 
-        const response = await fetch(
-            "https://api-inference.huggingface.co/models/google/flan-t5-large",
-            {
-                headers: { Authorization: `Bearer ${token}` },
-                method: "POST",
-                body: JSON.stringify(data),
-            }
-        );
+        const generationConfig = {
+            maxOutputTokens: 128, // Adjust for desired summary length (max 1024)
+            temperature: 1.0, // Adjust for creativity vs. informativeness (0.0-1.0)
+            topP: 0.1,
+            topK: 16,
+        };
 
-        const result = await response.json();
-        // console.log(result);
-        setAnswer(result[0].generated_text);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro", generationConfig });
 
-        return result;
+        // console.log(prompt);
+
+        let text = '';
+        try {
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            text = response.text();
+        }
+        catch (error) {
+            throw new Error('Error generating answer...');
+        }
+
+        // console.log(text);
+        setAnswer(text);
+
+        return text;
 
     }
 
     const copyText = (e) => {
         e.preventDefault();
         navigator.clipboard.writeText(answer).then(() => {
-            // Success message
             toast.success('Text copied to clipboard!');
         }, () => {
-            // Error message
             toast.error('Error copying text to clipboard!');
         });
     }
@@ -107,9 +136,6 @@ export default function QA() {
     const btnsForInput = (
 
         <div className="row w-50 m-auto p-2 justify-content-around">
-            {/* <div className="col">
-                <button className="btn btn-success" onClick={handleSubmit}>Summary</button>
-            </div> */}
             <div className="col">
                 <button className="btn btn-primary" onClick={(e) => {
                     e.preventDefault();
@@ -121,7 +147,7 @@ export default function QA() {
     );
 
     return (
-        <div className="container">
+        <div className="container-fluid w-100 px-5">
             <div className="row">
                 <div className="col-12 col-md-6">
                     <TextBox value={text} disabled={false} placeholder={"Enter text here.."} rows={10} handleChange={handleText} handleSubmit={handleSubmit} buttons={btnsForInput} />

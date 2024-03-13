@@ -3,74 +3,73 @@ import Searchbar from '../component/Searchbar';
 import '../Styles/searchbar.css';
 import '../Styles/text2img.css';
 import { toast } from 'react-hot-toast';
-import ReactPlayer from 'react-player';
-
-
+import LoadingGif from '../images/loading.gif';
+// import ReactPlayer from 'react-player';
 
 export default function Text2image() {
     const [search, setSearch] = useState('');
     const [image, setImage] = useState();
+    const [tryAgain, setTryAgain] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleChange = (event) => {
         setSearch(event.target.value);
     };
 
+    const beforeImageGeneration = async () => {
+        setSearch('');
+        setImage();
+        setLoading(true)
+        if (search === '') {
+            toast.error('Please enter query!!.');
+            setLoading(false);
+            return;
+        }
+        const isOnline = window.navigator.onLine;
+        if (!isOnline) {
+            toast.error('Please check your internet connection!!.');
+            setLoading(false);
+            return;
+        }
+
+        const data = { inputs: search };
+
+        toast.promise(generateImage(data), {
+            loading: 'Generating Image...',
+            success: 'Image generated successfully!',
+            error: error => error.message,
+        }).then(() => {
+            setLoading(false)
+        }).catch((error) => {
+            setLoading(false);
+            setSearch(data.inputs);
+        });
+    }
+
     const handleKeyDown = async (event) => {
-        // event.preventDefault();
         if (event.key === 'Enter') {
-            // console.log(search);
-            setSearch('');
-            setImage();
-            setLoading(true)
-            if (search === '') {
-                toast.error('Please enter query!!.');
-                setLoading(false);
-                return;
-            }
-            const isOnline = window.navigator.onLine;
-            if (!isOnline) {
-                toast.error('Please check your internet connection!!.');
-                setLoading(false);
-                return;
-            }
-
-            const data = { inputs: search };
-
-            toast.promise(generateImage(data), {
-                loading: 'Generating Image...',
-                success: 'Image generated successfully!',
-                error: (error) => {
-                    return `Error generating Image: ${error.message}`;
-                },
-            }).then(() => {
-                setLoading(false)
-            });
-            // await generateImage(data);
+            beforeImageGeneration();
         }
     };
 
     const generateImage = async (data) => {
         const token = process.env.REACT_APP_HUGGING_FACE_API_KEY;
-        // console.log("token : ", token);
+        setTryAgain(false);
         let response = {};
-        try {
-            response = await fetch(
-                "https://api-inference.huggingface.co/models/playgroundai/playground-v2-1024px-aesthetic",
-                {
-                    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-                    method: "POST",
-                    body: JSON.stringify(data),
-                }
-            );
+        response = await fetch(
+            "https://api-inference.huggingface.co/models/playgroundai/playground-v2-1024px-aesthetic",
+            {
+                headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+                method: "POST",
+                body: JSON.stringify(data),
+            }
+        );
 
+        if (!response.ok) {
+            const url = require('../images/retry.png');
+            setTryAgain(url);
+            throw new Error("Error generating Image...");
         }
-        catch (err) {
-            // response.status = 500;
-
-        };
-
-        // if (!response.ok) toast.error("Error generating Image.");
 
         const data1 = await response.blob();
         const imgUrl = URL.createObjectURL(data1)
@@ -82,35 +81,36 @@ export default function Text2image() {
         a.href = image;
         a.download = "image.png";
         a.click();
-        // console.log("downloaded");
         toast.success('Image downloaded.');
     }
 
     return (
         <>
-            {/* <div className='container-fluid1'> */}
             <Searchbar handleKeyDown={handleKeyDown} setSearch={setSearch} value={search} handleChange={handleChange} />
 
             {image && (
-                // <div className='container-fluid'>
-                // <img src={image} alt='generated' width="400" height="360" />
-                // </div>
 
-                <div class="container">
-                    <img src={image} alt="generated" width="400" height="500" />
-                    {/* <p class="title">card title</p> */}
-                    <div class="overlay"></div>
-                    <div class="button" onClick={downloadImg}>DOWNLOAD</div>
+                <div className="container">
+                    <img src={image} className='img' alt="generated" width="400" height="500" />
+                    <div className="overlay"></div>
+                    <div className="button" onClick={downloadImg}>DOWNLOAD</div>
+                </div>
+
+            )}
+            {tryAgain && (
+
+                <div className="container">
+                    <img src={tryAgain} className='tryAgain' alt="generated" width="200px" height="200px" onClick={beforeImageGeneration} />
                 </div>
 
             )}
             {loading &&
-                <div class="container2">
-                    <ReactPlayer url='text2img1.mp4' playing={true} muted={true} loop />
+                <div className="container2">
+                    {/* <ReactPlayer url='text2img1.mp4' playing={true} muted={true} loop /> */}
+                    <img src={LoadingGif} alt="loading" width="400px" height="400px" />
                 </div>
-            }
 
-            {/* </div> */}
+            }
         </>
 
     )

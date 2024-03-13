@@ -1,12 +1,11 @@
 import React, { useRef, useEffect } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import useSound from 'use-sound';
-import on from './on.mp3';
-import off from './off.mp3';
+import on from '../sounds/on.mp3';
+import off from '../sounds/off.mp3';
 
 export default function Searchbar(props) {
 
-    // const [transcript, setTranscript] = useState('');
     const [micOn] = useSound(on);
     const [micOff] = useSound(off);
 
@@ -46,13 +45,6 @@ export default function Searchbar(props) {
                 <span className="left-pan d-block"><i onClick={listening ? () => { handleMicClick(); micOff(); } : () => { handleMicClick(); micOn(); }} className={listening ? "fa fa-microphone" : "fa fa-microphone-slash"}></i></span>
 
             </div>
-            {/* <div>
-                <p>Microphone: {listening ? 'on' : 'off'}</p>
-                <button onClick={SpeechRecognition.startListening}>Start</button>
-                <button onClick={SpeechRecognition.stopListening}>Stop</button>
-                <button onClick={resetTranscript}>Reset</button>
-                <p>{transcript}</p>
-            </div> */}
 
         </div>
 

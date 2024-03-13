@@ -4,10 +4,6 @@ import '../Styles/navbar.css'
 
 export default function Navbar() {
     return (
-        // <div className="borderYtoX">
-        //     <Link className='link' to="/">SUMMARY</Link>
-        //     <Link className='link' to="/qa">QA</Link>
-        // </div>
 
         <nav className='mt-4'>
             <div className="container1">

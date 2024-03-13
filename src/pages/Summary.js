@@ -70,7 +70,7 @@ export default function Summary() {
         }
 
         if (outputSentence >= 1 && outputSentence <= maxOutputSentence) {
-            prompt = `write a summary of the following paragraph and don't generate random sentences. Give appropriate response if paragraph is too small:
+            prompt = `write a summary of the following paragraph and don't generate random sentences:
 ` + text + `
 Summarize it in ` + outputSentence + ` sentences at the third-grade reading level.`;
         }

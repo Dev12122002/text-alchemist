@@ -93,7 +93,7 @@ export default function Summary() {
         const token = process.env.REACT_APP_GEMINI_API_KEY;
         const genAI = new GoogleGenerativeAI(token);
         // const prompt = 'write a summary of the following text: ' + data;
-        // console.log("token : ", token);
+        console.log("token : ", token);
 
         // const response = await fetch(
         //     "https://api-inference.huggingface.co/models/facebook/bart-large-cnn",

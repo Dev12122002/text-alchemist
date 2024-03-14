@@ -2,13 +2,24 @@ import React from 'react'
 import TextBox from '../component/TextBox';
 import { useState } from 'react'
 import { toast } from 'react-hot-toast';
-import '../Styles/qa.css';
+import ImageUploader from '../component/ImageUploader';
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-export default function QA() {
-    const [text, setText] = useState('');
+export default function Img2QA() {
+
     const [answer, setAnswer] = useState('');
     const [question, setQuestion] = useState('');
+    const [imagebase64, setImageBase64] = useState('');
+    const [mimeType, setMimeType] = useState('');
+
+    const copyText = (e) => {
+        e.preventDefault();
+        navigator.clipboard.writeText(answer).then(() => {
+            toast.success('Text copied to clipboard!');
+        }, () => {
+            toast.error('Error copying text to clipboard!');
+        });
+    }
 
     const removeExtraSpaces = (text) => {
         // Regular expression to match one or more whitespace characters
@@ -21,13 +32,6 @@ export default function QA() {
         return trimmedText.trim();
     }
 
-    const handleText = (event) => {
-        let text = event.target.value;
-        if (text.charAt(text.length - 1) !== ' ')
-            text = removeExtraSpaces(event.target.value);
-        setText(text);
-    };
-
     const handleQuestion = (event) => {
         let text = event.target.value;
         if (text.charAt(text.length - 1) !== ' ')
@@ -37,13 +41,12 @@ export default function QA() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
-        if (text === '') {
-            toast.error('Please enter some text.');
+        if (imagebase64 === '') {
+            toast.error('Please upload an image!');
             return;
         }
-        else if (question === '') {
-            toast.error('Please enter the question.');
+        if (question === '') {
+            toast.error('Please enter a question!');
             return;
         }
 
@@ -53,58 +56,62 @@ export default function QA() {
             return;
         }
 
-        const prompt = `context : ${text}
-        
-Answer the following question based on context:
-${question}?`;
-
-        toast.promise(findAnswer(prompt), {
-            loading: 'Generating Answer...',
-            success: 'Answer generated successfully!',
+        toast.promise(ImageQuestionAnswer(question), {
+            loading: 'Generating response...',
+            success: 'Response generated successfully!',
             error: error => error.message,
         });
-    };
+    }
 
-    const findAnswer = async (prompt) => {
+    function fileToGenerativePart(data, mimeType) {
+        return {
+            inlineData: {
+                data,
+                mimeType
+            },
+        };
+    }
+
+    const ImageQuestionAnswer = async (prompt) => {
 
         const token = process.env.REACT_APP_GEMINI_API_KEY;
         const genAI = new GoogleGenerativeAI(token);
 
         const generationConfig = {
             maxOutputTokens: 128, // Adjust for desired summary length (max 1024)
-            temperature: 1.0, // Adjust for creativity vs. informativeness (0.0-1.0)
+            temperature: 0.0, // Adjust for creativity vs. informativeness (0.0-1.0)
             topP: 0.1,
             topK: 16,
         };
 
-        const model = genAI.getGenerativeModel({ model: "gemini-pro", generationConfig });
-
-        // console.log(prompt);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision", generationConfig });
 
         let text = '';
+
+        const imageParts = [
+            fileToGenerativePart(imagebase64, mimeType),
+        ];
+
         try {
-            const result = await model.generateContent(prompt);
+            const result = await model.generateContent([prompt, ...imageParts]);
             const response = await result.response;
             text = response.text();
         }
         catch (error) {
-            throw new Error('Error generating answer...');
+            if ((error.message).includes('Request payload size exceeds the limit')) {
+                throw new Error('Request payload size exceeds the limit. Reduce the size of the image or question.');
+            }
+            throw new Error('Error generating response...');
         }
 
-        // console.log(text);
+        if (text === '') {
+            throw new Error('Error generating response...');
+        }
+
         setAnswer(text);
 
         return text;
 
-    }
-
-    const copyText = (e) => {
-        e.preventDefault();
-        navigator.clipboard.writeText(answer).then(() => {
-            toast.success('Text copied to clipboard!');
-        }, () => {
-            toast.error('Error copying text to clipboard!');
-        });
     }
 
     const btnsForQuestion = (
@@ -139,24 +146,12 @@ ${question}?`;
 
     );
 
-    const btnsForInput = (
-
-        <div className="row w-50 m-auto p-2 justify-content-around">
-            <div className="col">
-                <button className="btn btn-primary" onClick={(e) => {
-                    e.preventDefault();
-                    setText('');
-                }}>Clear</button>
-            </div>
-        </div>
-
-    );
-
     return (
         <div className="container-fluid w-100 px-5">
             <div className="row">
                 <div className="col-12 col-md-6">
-                    <TextBox value={text} disabled={false} placeholder={"Enter text here.."} rows={10} handleChange={handleText} handleSubmit={handleSubmit} buttons={btnsForInput} />
+                    {/* <TextBox value='' disabled={false} placeholder={"Enter text here.."} rows={10} handleSubmit={handleSubmit} /> */}
+                    <ImageUploader setImageBase64={setImageBase64} setMimeType={setMimeType} />
                 </div>
                 <div className="col-12 col-md-6">
                     <div className="row">
@@ -164,7 +159,7 @@ ${question}?`;
                             <TextBox value={question} disabled={false} placeholder={"Enter question here.."} rows={2} handleChange={handleQuestion} buttons={btnsForQuestion} width={"90%"} />
                         </div>
                         <div className="col-12 p-0">
-                            <TextBox value={answer} disabled={true} placeholder={"Answer will be shown here.."} rows={3} handleChange={handleText} buttons={btnsForResult} width={"90%"} />
+                            <TextBox value={answer} disabled={true} placeholder={"Answer will be shown here.."} rows={3} buttons={btnsForResult} width={"90%"} />
                         </div>
                     </div>
                 </div>

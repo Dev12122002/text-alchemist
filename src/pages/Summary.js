@@ -51,6 +51,12 @@ export default function Summary() {
             return;
         }
 
+        const isOnline = window.navigator.onLine;
+        if (!isOnline) {
+            toast.error('Please check your internet connection!!.');
+            return;
+        }
+
         let trimText = removeExtraSpaces(text);
         setText(trimText);
 

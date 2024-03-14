@@ -8,30 +8,6 @@ export default function Navbar() {
         <nav className='mt-4'>
             <div className="container1">
                 <ul className="nav-list1">
-                    {/* <li className="nav-item1">
-                        <a href="#" className="nav-link1 gb-hover">
-                            <div className="border gradient-blue"></div>
-                            Home
-                            <div className="border-bottom"></div>
-                        </a>
-                    </li>
-                    <li className="nav-item1">
-                        <a href="#" className="nav-link1 gg-hover">
-                            <div className="border gradient-green"></div>
-                            <div className="icons">
-                                <i className="fas fa-users kurumsal"></i>
-                                About
-                            </div>
-                            <div className="border-bottom"></div>
-                        </a>
-                    </li>
-                    <li className="nav-item1">
-                        <a href="#" className="nav-link1 gp-hover">
-                            <div className="border gradient-purple"></div>
-                            Projects
-                            <div className="border-bottom"></div>
-                        </a>
-                    </li> */}
                     <li className="nav-item1">
                         <Link to="/" className="nav-link1 blue-top gm-hover">
                             <div className="border gradient-mauve"></div>
@@ -62,13 +38,16 @@ export default function Navbar() {
                             <div className="border-bottom"></div>
                         </Link>
                     </li>
-                    {/* <li className="nav-item1">
-                        <a href="#" className="nav-link1 blue-top gl-hover">
-                            <div className="border gradient-lush"></div>
-                            Contact
+                    <li className="nav-item1">
+                        <Link to="/img2qa" className="nav-link1 blue-top gb-hover">
+                            <div className="border gradient-blue"></div>
+                            <div className="icons">
+                                Image2QA
+                                <i className="fa-solid fa-chalkboard-user right ref"></i>
+                            </div>
                             <div className="border-bottom"></div>
-                        </a>
-                    </li> */}
+                        </Link>
+                    </li>
                 </ul>
             </div>
         </nav>

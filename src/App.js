@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Summary from "./pages/Summary";
 import QA from "./pages/QA";
 import Text2Image from "./pages/Text2image";
+import Img2QA from './pages/Img2QA';
 import Navbar from './component/Navbar';
 import { Toaster } from 'react-hot-toast';
 
@@ -28,7 +29,7 @@ function App() {
           <Route exact path="/" element={<Summary />} />
           <Route path="/QA" element={<QA />} />
           <Route path="/text2img" element={<Text2Image />} />
-
+          <Route path="/img2qa" element={<Img2QA />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div >
